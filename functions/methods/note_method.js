@@ -194,8 +194,7 @@ exports.addNoteItemProcess = function (msg, callback, step) {
           resolve({
             method: "sendMessage",
             chat_id: msg.chat.id,
-            text:
-              "完成！！備忘錄新增成功 可以使用 /note 去分類裡查看備忘錄囉",
+            text: "完成！！備忘錄新增成功 可以使用 /note 去分類裡查看備忘錄囉",
           });
           return;
         });
@@ -205,7 +204,8 @@ exports.addNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
+          text:
+            "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
         });
     }
   });
@@ -263,7 +263,8 @@ exports.editNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
+          text:
+            "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
         });
     }
   });
@@ -326,7 +327,8 @@ exports.removeNoteItem = function (callback) {
           resolve({
             method: "sendMessage",
             chat_id: callback.message.chat.id,
-            text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
+            text:
+              "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
           });
           break;
       }
@@ -353,10 +355,13 @@ exports.backNote = function (callback) {
 };
 
 exports.pageNote = function (callback) {
-    let callback_data = callback.data.toString();
-    if (/\/note_page_next/.test(callback_data) && (notePage + 1) * 3 < noteListLength) {
-        notePage += 1;
-    } else if (/\/note_page_pre/.test(callback_data) && notePage > 0) {
-        notePage -= 1;
-    }
-}
+  let callback_data = callback.data.toString();
+  if (
+    /\/note_page_next/.test(callback_data) &&
+    (notePage + 1) * 3 < noteListLength
+  ) {
+    notePage += 1;
+  } else if (/\/note_page_pre/.test(callback_data) && notePage > 0) {
+    notePage -= 1;
+  }
+};

@@ -28,6 +28,48 @@ exports.inlineKeyboardMoney = function (msg) {
   };
 };
 
+exports.note = function (callback_query, callback_data) {
+  return new Promise((resolve, reject) => {
+    if (/\/note_category/.test(callback_data)) {
+      note_method
+        .inlineKeyboardNoteList(callback_query, callback_data.split("_")[2])
+        .then((response) => {
+          resolve(response);
+          return;
+        });
+    } else if (/\/note_item/.test(callback_data)) {
+      note_method.getNoteItemContent(callback_query).then((response) => {
+        resolve(response);
+        return;
+      });
+    } else if (/\/note_add/.test(callback_data)) {
+      resolve(note_method.addNoteItem(callback_query));
+      return;
+    } else if (/\/note_page/.test(callback_data)) {
+      note_method.pageNote(callback_query);
+      note_method
+        .inlineKeyboardNoteList(callback_query, callback_data.split("_")[3])
+        .then((response) => {
+          resolve(response);
+          return;
+        });
+    } else if (/\/note_edit/.test(callback_data)) {
+      resolve(note_method.editNoteItem(callback_query));
+      return;
+    } else if (/\/note_remove/.test(callback_data)) {
+      note_method.removeNoteItem(callback_query).then((response) => {
+        resolve(response);
+        return;
+      });
+    } else if (/\/note_back/.test(callback_data)) {
+      note_method.backNote(callback_query).then((response) => {
+        resolve(response);
+        return;
+      });
+    }
+  });
+};
+
 exports.defaultMessage = function (msg) {
   return new Promise((resolve, reject) => {
     if (/\/note_add/.test(featureNow.feature)) {
@@ -76,6 +118,6 @@ exports.cancelSendFeature = function (msg) {
   return {
     method: "sendMessage",
     chat_id: msg.chat.id,
-    text: `輸入操作已經取消囉！`,
+    text: `輸入操作已經取消囉`,
   };
 };
