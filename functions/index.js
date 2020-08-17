@@ -1,4 +1,3 @@
-const firebase = require("firebase");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
@@ -11,7 +10,8 @@ const cors = require("cors");
 
 const app = express();
 
-const methods = require("./methods");
+const methods = require("./methods/methods");
+const note_method = require("./methods/note_method");
 const e = require("express");
 
 app.use(
@@ -31,8 +31,10 @@ app.post("/", async (req, res) => {
     if (/\/money/.test(message_content)) {
       return res.status(200).send(methods.inlineKeyboardMoney(message));
     } else if (/\/note/.test(message_content)) {
-      methods.inlineKeyboardNoteCategory(message).then((response) => {
-        return res.status(200).send(response);
+      note_method.cacheNoteList().then((response) => {
+        return res
+          .status(200)
+          .send(note_method.inlineKeyboardNoteCategory(message));
       });
     } else if (/\/cancel/.test(message_content)) {
       return res.status(200).send(methods.cancelSendFeature(message));
@@ -51,41 +53,33 @@ app.post("/", async (req, res) => {
       return res
         .status(200)
         .send(methods.inlineKeyboardMoneyCategory(callback_query));
-    } else if (
-      callback_data === "/note_category_work" ||
-      callback_data === "/note_category_private"
-    ) {
-      methods
+    } else if (/\/note_category/.test(callback_data)) {
+      note_method
         .inlineKeyboardNoteList(callback_query, callback_data.split("_")[2])
         .then((response) => {
           return res.status(200).send(response);
         });
     } else if (/\/note_item/.test(callback_data)) {
-      methods.getNoteItemContent(callback_query).then((response) => {
+      note_method.getNoteItemContent(callback_query).then((response) => {
         return res.status(200).send(response);
       });
     } else if (/\/note_add/.test(callback_data)) {
-      return res.status(200).send(methods.addNoteItem(callback_query));
-    } else if (
-      callback_data === "/note_next" ||
-      callback_data === "/note_pre"
-    ) {
-      if (methods.changeNotePage(callback_query)) {
-        methods.inlineKeyboardNoteList(callback_query).then((response) => {
+      return res.status(200).send(note_method.addNoteItem(callback_query));
+    } else if (/\/note_page/.test(callback_data)) {
+      note_method.pageNote(callback_query);
+      note_method
+        .inlineKeyboardNoteList(callback_query, callback_data.split("_")[3])
+        .then((response) => {
           return res.status(200).send(response);
         });
-      }
     } else if (/\/note_edit/.test(callback_data)) {
-      return res.status(200).send(methods.editNoteItem(callback_query));
+      return res.status(200).send(note_method.editNoteItem(callback_query));
     } else if (/\/note_remove/.test(callback_data)) {
-      methods.removeNoteItem(callback_query).then((response) => {
+      note_method.removeNoteItem(callback_query).then((response) => {
         return res.status(200).send(response);
       });
-    } else if (
-      callback_data === "/note_back_main" ||
-      callback_data === "/note_back_list"
-    ) {
-      methods.backNote(callback_query).then((response) => {
+    } else if (/\/note_back/.test(callback_data)) {
+      note_method.backNote(callback_query).then((response) => {
         return res.status(200).send(response);
       });
     } else if (callback_data === "/cancel") {
