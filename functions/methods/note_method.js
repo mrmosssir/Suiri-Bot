@@ -16,7 +16,6 @@ exports.cacheNoteList = function () {
   return new Promise((resolve, reject) => {
     database.ref("api/note").once("value", (snapshot) => {
       noteList = snapshot.val();
-      console.log(noteList);
       notePage = 0;
       resolve(true);
     });
@@ -27,7 +26,7 @@ exports.cacheNoteList = function () {
 exports.inlineKeyboardNoteCategory = function (msg, mode = false) {
   let result = {
     method: "sendMessage",
-    text: `Which record do you want, Boss ?`,
+    text: `想選擇哪項備忘錄功能呢？`,
     reply_markup: JSON.stringify({
       inline_keyboard: inline_keyboard.note_category,
     }),
@@ -39,7 +38,6 @@ exports.inlineKeyboardNoteCategory = function (msg, mode = false) {
   } else {
     result.chat_id = msg.chat.id;
   }
-  console.log(result);
   return result;
 };
 
@@ -54,7 +52,7 @@ exports.inlineKeyboardNoteList = function (callback, category) {
         method: "editMessageText",
         chat_id: callback.message.chat.id,
         message_id: callback.message.message_id,
-        text: "Sorry, this category has no data.",
+        text: "抱歉 目前這個分類沒有任何備忘錄\n請先至主頁新增項目哦",
         reply_markup: JSON.stringify({
           inline_keyboard: [inline_keyboard.note_features.backMain],
         }),
@@ -88,7 +86,7 @@ exports.inlineKeyboardNoteList = function (callback, category) {
       method: "editMessageText",
       chat_id: callback.message.chat.id,
       message_id: callback.message.message_id,
-      text: "These is your note list, Boss !!",
+      text: "這些是你的備忘錄列表",
       reply_markup: JSON.stringify({
         inline_keyboard: inline_list,
       }),
@@ -142,7 +140,7 @@ exports.addNoteItem = function (callback) {
       method: "editMessageText",
       chat_id: callback.message.chat.id,
       message_id: callback.message.message_id,
-      text: `I see, what this note category ?`,
+      text: `好 我知道了 那這個備忘錄要被記錄在哪個分類呢？`,
       reply_markup: JSON.stringify({
         inline_keyboard: inline_keyboard.note_add_category,
       }),
@@ -154,7 +152,7 @@ exports.addNoteItem = function (callback) {
       method: "editMessageText",
       chat_id: callback.message.chat.id,
       message_id: callback.message.message_id,
-      text: `OK, send me "Title" text for this note\nYou can send /cancel when change mind`,
+      text: `OK, 給我這個備忘錄的標題吧 ~ 或是可以輸入 /cancel 來取消新增`,
     };
   }
 };
@@ -169,7 +167,7 @@ exports.addNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: "Receive title and next please send the note content",
+          text: "收到標題了，現在是內容 OwO",
         });
         break;
       case 2:
@@ -197,7 +195,7 @@ exports.addNoteItemProcess = function (msg, callback, step) {
             method: "sendMessage",
             chat_id: msg.chat.id,
             text:
-              "Done !! note save complete, you can execute /note to view this note",
+              "完成！！備忘錄新增成功 可以使用 /note 去分類裡查看備忘錄囉",
           });
           return;
         });
@@ -207,7 +205,7 @@ exports.addNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: "Sorry, data break...please try again !!",
+          text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
         });
     }
   });
@@ -220,7 +218,7 @@ exports.editNoteItem = function (callback) {
     method: "editMessageText",
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
-    text: `OK ! Please send Title first or command /cancel to exit`,
+    text: `好的 ~ 給我你想修改的標題或輸入 /noset 來跳過\n如果想取消請使用 /cancel 指令`,
   };
 };
 
@@ -234,7 +232,7 @@ exports.editNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: `set Title complete and now send Content or command /cancel to exit.\nif you don't want to set content you can send me /noset.`,
+          text: `標題修改完成 ~ 現在是內容！一樣可以使用 /noset 或 /cancel 來跳過或取消修改哦`,
         });
         break;
       case 2:
@@ -255,7 +253,7 @@ exports.editNoteItemProcess = function (msg, callback, step) {
           resolve({
             method: "sendMessage",
             chat_id: msg.chat.id,
-            text: `Done !! your note is update now.`,
+            text: `完成 你的備忘錄已經更新了`,
           });
           return;
         });
@@ -265,7 +263,7 @@ exports.editNoteItemProcess = function (msg, callback, step) {
         resolve({
           method: "sendMessage",
           chat_id: msg.chat.id,
-          text: "Sorry, data break...please try again !!",
+          text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
         });
     }
   });
@@ -280,7 +278,7 @@ exports.removeNoteItem = function (callback) {
         method: "editMessageText",
         chat_id: callback.message.chat.id,
         message_id: callback.message.message_id,
-        text: "Are you sure you want to remove this note ?",
+        text: "真的要移除嗎？\n要不要確定是否已完成或不需要了",
         reply_markup: JSON.stringify({
           inline_keyboard: [
             [
@@ -310,7 +308,7 @@ exports.removeNoteItem = function (callback) {
               method: "editMessageText",
               chat_id: callback.message.chat.id,
               message_id: callback.message.message_id,
-              text: "Done, note remove complete.",
+              text: "好的 移除成功囉 ~",
               reply_markup: JSON.stringify({
                 inline_keyboard: [inline_keyboard.note_features.backMain],
               }),
@@ -328,7 +326,7 @@ exports.removeNoteItem = function (callback) {
           resolve({
             method: "sendMessage",
             chat_id: callback.message.chat.id,
-            text: "Sorry, data break...please try again !!",
+            text: "出現了點問題 OAO 稍等一下再試試看\n如果都沒改善請聯絡我們\nMail：uchen7489@gmail.com",
           });
           break;
       }

@@ -48,7 +48,7 @@ exports.defaultMessage = function (msg) {
       resolve({
         method: "sendMessage",
         chat_id: msg.chat.id,
-        text: `Ok... That's a message, but I don't understand.`,
+        text: `我看不懂這個 可以教教我或使用 /help 來看看我懂那些指令哦`,
       });
     }
   });
@@ -58,16 +58,15 @@ exports.defaultQueryMessage = function (callback) {
   return {
     method: "sendMessage",
     chat_id: callback.message.chat.id,
-    text: `Oops !! This feature is on maintenance...Sorry`,
+    text: `功能目前維護中！請稍後再試\n如有任何問題可連絡我們：\nMail：uchen7489@gmail.com`,
   };
 };
 
 exports.removeInlineKeyboardMessage = function (callback) {
   return {
-    method: "editMessageText",
+    method: "deleteMessage",
     chat_id: callback.message.chat.id,
     message_id: callback.message.message_id,
-    text: `OK... It's closed !`,
   };
 };
 
@@ -77,6 +76,6 @@ exports.cancelSendFeature = function (msg) {
   return {
     method: "sendMessage",
     chat_id: msg.chat.id,
-    text: `OK, interrupt input`,
+    text: `輸入操作已經取消囉！`,
   };
 };
