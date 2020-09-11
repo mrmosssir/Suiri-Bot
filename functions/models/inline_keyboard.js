@@ -76,6 +76,7 @@ let note_add_category = [
             callback_data: '/note_add_private'
         }
     ],
+    note_features.backMain,
     note_features.cancel
 ]
 
