@@ -113,11 +113,19 @@ exports.removeInlineKeyboardMessage = function (callback) {
 };
 
 exports.cancelSendFeature = function (msg) {
-  featureNow.feature = "/default";
-  featureNow.step = 1;
-  return {
-    method: "sendMessage",
-    chat_id: msg.chat.id,
-    text: `輸入操作已經取消囉`,
-  };
+  if (featureNow.feature === "/default" && featureNow.step === 1) {
+    return {
+      method: "sendMessage",
+      chat_id: msg.chat.id,
+      text: `目前沒有需要關閉的功能哦`,
+    };
+  } else {
+    featureNow.feature = "/default";
+    featureNow.step = 1;
+    return {
+      method: "sendMessage",
+      chat_id: msg.chat.id,
+      text: `輸入操作已經取消囉`,
+    };
+  }
 };

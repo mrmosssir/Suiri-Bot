@@ -10,6 +10,8 @@ const cors = require("cors");
 
 const app = express();
 
+const { help_info } = require("./models/help_info");
+
 const methods = require("./methods/methods");
 const note_method = require("./methods/note_method");
 const e = require("express");
@@ -31,10 +33,20 @@ app.post("/", async (req, res) => {
     if (/\/money/.test(message_content)) {
       return res.status(200).send(methods.inlineKeyboardMoney(message));
     } else if (/\/note/.test(message_content)) {
-      note_method.cacheNoteList().then((response) => {
+      note_method.cacheNoteList(message.chat.id).then((response) => {
         return res
           .status(200)
           .send(note_method.inlineKeyboardNoteCategory(message));
+      });
+    } else if (/\/help/.test(message_content)) {
+      let result = `我是你的生活小秘書 Suiri\n你可以使用我處理大大小小的事情\n\n以下是我現在擁有的功能：\n\n`;
+      help_info.forEach((item) => {
+        result += `${item.command} - ${item.content}\n`;
+      });
+      return res.status(200).send({
+        method: "sendMessage",
+        chat_id: message.chat.id,
+        text: result,
       });
     } else if (/\/cancel/.test(message_content)) {
       return res.status(200).send(methods.cancelSendFeature(message));

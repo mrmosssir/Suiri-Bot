@@ -1,10 +1,4 @@
-// data param = {
-//     method,
-//     category,
-//     per,
-//     length,
-//     current
-// }
+// data param = { method, category, per, length, current }
 exports.control = function (data) {
   if (data.length > 3) {
     if ((data.current + 1) * 3 >= data.length) {

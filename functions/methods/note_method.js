@@ -12,9 +12,9 @@ let noteItem = {
 let notePage = 0;
 let noteListLength = 0;
 
-exports.cacheNoteList = function () {
+exports.cacheNoteList = function (chatId) {
   return new Promise((resolve, reject) => {
-    database.ref("api/note").once("value", (snapshot) => {
+    database.ref(`api/note/${chatId}`).once("value", (snapshot) => {
       noteList = snapshot.val();
       notePage = 0;
       resolve(true);
@@ -52,7 +52,7 @@ exports.inlineKeyboardNoteList = function (callback, category) {
         method: "editMessageText",
         chat_id: callback.message.chat.id,
         message_id: callback.message.message_id,
-        text: "抱歉 目前這個分類沒有任何備忘錄\n請先至主頁新增項目哦",
+        text: "抱歉 目前這個分類沒有任何備忘錄或紀錄已過期\n請至主頁確認或新增項目哦",
         reply_markup: JSON.stringify({
           inline_keyboard: [inline_keyboard.note_features.backMain],
         }),
@@ -172,25 +172,25 @@ exports.addNoteItemProcess = function (msg, callback, step) {
         break;
       case 2:
         noteItem.content = msg.text;
-        key = database.ref(`/api/note/note_list/${noteItem.category}`).push()
+        key = database.ref(`/api/note/${msg.chat.id}/note_list/${noteItem.category}`).push()
           .key;
         while (key.indexOf("_") !== -1) {
           key.replace("_", "-");
         }
         database
-          .ref(`/api/note/note_list/${noteItem.category}`)
+          .ref(`/api/note/${msg.chat.id}/note_list/${noteItem.category}`)
           .child(key)
           .set({
             title: noteItem.title,
           });
-        database.ref("/api/note/note_content").child(key).set({
+        database.ref(`/api/note/${msg.chat.id}/note_content`).child(key).set({
           date: new Date().valueOf(),
           category: noteItem.category,
           title: noteItem.title,
           content: noteItem.content,
         });
         methods.setStatus("/default", 1);
-        this.cacheNoteList().then((response) => {
+        this.cacheNoteList(msg.chat.id).then((response) => {
           resolve({
             method: "sendMessage",
             chat_id: msg.chat.id,
@@ -238,18 +238,18 @@ exports.editNoteItemProcess = function (msg, callback, step) {
       case 2:
         noteItem.content = msg.text !== "/noset" ? msg.text : noteItem.content;
         database
-          .ref(`/api/note/note_list/${noteItem.category}`)
+          .ref(`/api/note/${msg.chat.id}/note_list/${noteItem.category}`)
           .child(id)
           .update({
             title: noteItem.title,
           });
-        database.ref("/api/note/note_content").child(id).update({
+        database.ref(`/api/note/${msg.chat.id}/note_content`).child(id).update({
           category: noteItem.category,
           title: noteItem.title,
           content: noteItem.content,
         });
         methods.setStatus("/default", 1);
-        this.cacheNoteList().then((response) => {
+        this.cacheNoteList(msg.chat.id).then((response) => {
           resolve({
             method: "sendMessage",
             chat_id: msg.chat.id,
@@ -301,10 +301,10 @@ exports.removeNoteItem = function (callback) {
       switch (accept) {
         case "yes":
           database
-            .ref(`api/note/note_list/${noteItem.category}/${id}`)
+            .ref(`api/note/${callback.message.chat.id}/note_list/${noteItem.category}/${id}`)
             .remove();
-          database.ref(`api/note/note_content/${id}`).remove();
-          this.cacheNoteList().then((response) => {
+          database.ref(`api/note/${callback.message.chat.id}/note_content/${id}`).remove();
+          this.cacheNoteList(callback.message.chat.id).then((response) => {
             resolve({
               method: "editMessageText",
               chat_id: callback.message.chat.id,
